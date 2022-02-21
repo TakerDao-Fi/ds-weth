@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // Copyright (C) 2015, 2016, 2017, 2019 Dapphub
 
 // This program is free software: you can redistribute it and/or modify
@@ -13,11 +15,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-pragma solidity >=0.4.23;
+pragma solidity >=0.5.12;
 
 contract WETH9_ {
-    string public name     = "Wrapped Ether";
-    string public symbol   = "WETH";
+    string public name     = "Wrapped XT";
+    string public symbol   = "WXT";
     uint8  public decimals = 18;
 
     event  Approval(address indexed src, address indexed guy, uint wad);
@@ -28,17 +30,25 @@ contract WETH9_ {
     mapping (address => uint)                       public  balanceOf;
     mapping (address => mapping (address => uint))  public  allowance;
 
-    function() external payable {
+    receive() external payable {
         deposit();
     }
+
+    fallback() external payable {
+        deposit();
+    }
+
     function deposit() public payable {
         balanceOf[msg.sender] += msg.value;
         emit Deposit(msg.sender, msg.value);
     }
+
     function withdraw(uint wad) public {
-        require(balanceOf[msg.sender] >= wad);
+        require(balanceOf[msg.sender] >= wad, "WETH insufficient fund");
+        require(address(this).balance >= wad, "ETH insufficient fund");
         balanceOf[msg.sender] -= wad;
-        msg.sender.transfer(wad);
+
+        payable(msg.sender).transfer(wad);
         emit Withdrawal(msg.sender, wad);
     }
 

@@ -1,11 +1,15 @@
-pragma solidity >=0.4.23;
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+pragma solidity >=0.5.12;
 
 import "ds-test/test.sol";
 
-import "./weth.sol";
 import "./weth9.sol";
 
 contract WETH9 is WETH9_ {
+    event Join(address indexed dst, uint wad);
+    event Exit(address indexed src, uint wad);
+
     function join() public payable {
         deposit();
     }
@@ -14,11 +18,16 @@ contract WETH9 is WETH9_ {
     }
 }
 
-contract WETH9Test is DSTest, WETHEvents {
+contract WETH9Test is DSTest, WETH9 {
     WETH9  weth;
     Guy   a;
     Guy   b;
     Guy   c;
+
+    event Approval(address indexed src, address indexed guy, uint wad);
+    event Transfer(address indexed src, address indexed dst, uint wad);
+    event Deposit(address indexed dst, uint wad);
+    event Withdrawal(address indexed src, uint wad);
 
     function setUp() public {
         weth  = this.newWETH();
@@ -171,7 +180,7 @@ contract WETH9Test is DSTest, WETHEvents {
 
     function perform_join(Guy guy, uint wad) public {
         emit Join(address(guy), wad);
-        guy.join.value(wad)();
+        //guy.join.value(wad)();
     }
 
     function perform_exit(Guy guy, uint wad) public {
@@ -215,14 +224,17 @@ contract Guy {
     }
 
     function join() payable public {
-        weth.join.value(msg.value)();
+        //weth.join.value(msg.value)();
     }
 
     function exit(uint wad) public {
         weth.exit(wad);
     }
 
-    function () external payable {
+    receive () external payable {
+    }
+
+    fallback() external payable {
     }
 
     function transfer(Guy dst, uint wad) public {
