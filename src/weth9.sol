@@ -44,8 +44,8 @@ contract WETH9_ {
     }
 
     function withdraw(uint wad) public {
-        require(balanceOf[msg.sender] >= wad, "WETH insufficient fund");
-        require(address(this).balance >= wad, "ETH insufficient fund");
+        require(balanceOf[msg.sender] >= wad, "WXT insufficient fund");
+        require(address(this).balance >= wad, "XT insufficient fund");
         balanceOf[msg.sender] -= wad;
 
         payable(msg.sender).transfer(wad);
